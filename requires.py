@@ -19,26 +19,28 @@ from charms.reactive import RelationBase
 from charms.reactive import scopes
 
 
-class NodeRedDeployerRequires(RelationBase):
+class NodeRedflowRequires(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{requires:nodered-deployer}-relation-{joined,changed}')
+    @hook('{requires:nodered-flow}-relation-{joined,changed}')
     def changed(self):
         conv = self.conversation()
-        if conv.get_remote('port'):
+        if conv.get_remote('nodes'):
             # this unit's conversation has a port, so
             # it is part of the set of available units
             conv.set_state('{relation_name}.available')
 
-    @hook('{requires:nodered-deployer}-relation-{departed,broken}')
+    @hook('{requires:nodered-flow}-relation-{departed,broken}')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.available')
 
     def connection(self):
         conv = self.conversation()
-        data = {'host': conv.get_remote('host'),
-                'port': conv.get_remote('port'),
-                'dataflow' : conv.get_remote('dataflow'),
+        data = {'dataflow' : conv.get_remote('dataflow'),
                 'nodes' : conv.get_remote('nodes')}
         return(data)
+
+    def deployed(self):
+        conv = self.conversation()
+        conv.set_state('{relation_name}.deployed')

@@ -20,26 +20,23 @@ from charms.reactive import RelationBase
 from charms.reactive import scopes
 
 
-class NodeRedDeployerProvides(RelationBase):
+class NodeRedflowrProvides(RelationBase):
     scope = scopes.UNIT
 
-    @hook('{provides:nodered-deployer}-relation-{joined,changed}')
+    @hook('{provides:nodered-flow}-relation-{joined,changed}')
     def changed(self):
         conv = self.conversation()
         conv.set_state('{relation_name}.available')
 
-    @hook('{provides:nodered-deployer}-relation-{broken,departed}')
+    @hook('{provides:nodered-flow}-relation-{broken,departed}')
     def broken(self):
         conv = self.conversation()
         conv.remove_state('{relation_name}.available')
 
-    def configure(self, dataflow, nodes, port, hostname=None):
-        if not hostname:
-            hostname = hookenv.unit_get('private-address')
+    def configure(self, dataflow, nodes):
         relation_info = {
-            'host': hostname,
-            'port': port,
             'dataflow': dataflow,
             'nodes' : nodes}
         for conv in self.conversations():
             conv.set_remote(**relation_info)
+
